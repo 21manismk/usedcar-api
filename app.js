@@ -1,6 +1,7 @@
 const express = require('express');
 var conn = require('./config/db');
 console.log("all is well")
+const cors = require("cors");
 const app = express();
 // app.use(app.router);
 // routes.initialize(app);
@@ -13,7 +14,7 @@ conn.connect((err)=>{
     else
     console.log('db connect')
 });
-// app.use(cors());
+ app.use(cors());
 app.use(express.json()); 
 // app.use(bodyParser.urlencoded({ extended: false }))
 // app.use(bodyParser.json())
