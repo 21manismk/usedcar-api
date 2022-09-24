@@ -3,7 +3,7 @@ var conn = require('./config/db');
 console.log("all is well")
 const cors = require("cors");
 const app = express();
-const cors = require('cors');
+
 // app.use(app.router);
 // routes.initialize(app);
 const listener = app.listen(process.env.PORT || 3004, '0.0.0.0',() => {

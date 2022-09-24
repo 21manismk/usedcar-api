@@ -6,7 +6,6 @@ const signup=(req,res)=>{
     var password=req.body.password
     var email=req.body.email
     var phone=req.body.phone
-
     var confirm_password=req.body.confirm_password
 
     var qry="select * from users where user_name=? and email=? "
