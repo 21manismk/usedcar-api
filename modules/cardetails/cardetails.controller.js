@@ -57,13 +57,13 @@ connection.query(qry,[req.body.cartype],function(err,result){
 }
 const filtertype=(req,res)=>{
     var data=req.body.value
-    var qry="SELECT * FROM car_details cd WHERE cd.status='0'"
+    var qry="SELECT * FROM car_details cd WHERE cd.status=?"
     console.log("result")
         if (req.query.value && req.query.value > 0) {
-        qry += " and  cd.used_car IN ('?')";
+        qry += " and cd.used_car IN ('?')";
         data.push(req.query.value);
     }
-    connection.query(qry,function(err,result){
+    connection.query(qry,['0'],function(err,result){
         console.log(result)
         if(err){
             res.send({
@@ -81,8 +81,8 @@ const filtertype=(req,res)=>{
     })
 }
 const getallcars=(req,res)=>{
-    var qry="SELECT * FROM car_details WHERE status=?"
-connection.query(qry,['0'],function(err,result){
+    var qry="SELECT cd.price,f.fuel_type,Concat(?, CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.status=?"
+connection.query(qry,['/public/carsimage/','0'],function(err,result){
     console.log(result)
     if(err){
         res.send({
