@@ -7,10 +7,10 @@ const signup=(req,res)=>{
     var email=req.body.email
     var phone=req.body.phone
 
-    // var confirm_password=req.body.confirm_password
+    var confirm_password=req.body.confirm_password
 
-    var qry="select * from users where email=?"
-    connection.query(qry,[name],function(err, result){
+    var qry="select * from users where user_name=? and email=? "
+    connection.query(qry,[name,email],function(err, result){
         if(err){
             res.send({
                 status: '400',
@@ -21,13 +21,13 @@ const signup=(req,res)=>{
         else if(result.length>0){
             res.send({
                 status: '400',
-                        message: "Username Already Exist",
+                        message: "Given Username or emailId is Already Exist",
                         data:[],
             })
         }
         else{   
-     var qry1="INSERT INTO users  (user_name,password,email,phone) VALUE (?,?,?,?)"
-    connection.query(qry1,[name,password,email,phone],function(err, result1){
+     var qry1="INSERT INTO users  (user_name,password,confirm_password,email,phone) VALUE (?,?,?,?,?)"
+    connection.query(qry1,[name,password,confirm_password,email,phone],function(err, result1){
 if(err){
     res.send({
         status: '400',
