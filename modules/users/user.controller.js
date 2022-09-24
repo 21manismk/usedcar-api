@@ -1,11 +1,15 @@
 var connection = require('../../config/db');
+// var images = require ('./public/image/');
 
 const signup=(req,res)=>{
     var name=req.body.name
     var password=req.body.password
-    var confirm_password=req.body.confirm_password
+    var email=req.body.email
+    var phone=req.body.phone
 
-    var qry="select * from user where username=?"
+    // var confirm_password=req.body.confirm_password
+
+    var qry="select * from user where email=?"
     connection.query(qry,[name],function(err, result){
         if(err){
             res.send({
@@ -22,8 +26,8 @@ const signup=(req,res)=>{
             })
         }
         else{   
-     var qry1="INSERT INTO USER  (username,password,confirm_password) VALUE (?,?,?)"
-    connection.query(qry1,[name,password,confirm_password],function(err, result1){
+     var qry1="INSERT INTO USER  (user_name,password,email,phone) VALUE (?,?,?,?)"
+    connection.query(qry1,[name,password,email,phone],function(err, result1){
 if(err){
     res.send({
         status: '400',
@@ -54,7 +58,7 @@ const login=(req,res)=>{
     var name=req.body.name
     var password=req.body.password
   
-    var qry="select * from user where username=? and password=?"
+    var qry="select * from user where user_name=? and password=?"
     connection.query(qry,[name,password],function(err, result){
 if(err){
     res.send({
@@ -80,6 +84,30 @@ else{
     })
 
 }
+const Banner=(req,res)=>{ 
+    
+    let qry ="SELECT Concat(?, CASE WHEN banner_img != '' THEN  Concat(banner_img) end) as  banner_img from banner_images  WHERE STATUS=? ";
+   
+    connection.query(qry,['../../public/image/','0'],function(err, result){
+        console.log("res",result)
+    if(result)
+    {
+        res.send({
+            success: true,
+            message: 'successfull..!',
+            data: result
+        });
+    }
+    else
+    {
+        res.send({
+            success: false,
+            message: 'Unsuccessfull..!',
+            data: []
+        }); 
+    }
+})
+}
 module.exports={
-    signup,login
+    signup,login,Banner
 }
