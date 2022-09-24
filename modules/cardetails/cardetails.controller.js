@@ -56,8 +56,14 @@ connection.query(qry,[req.body.cartype],function(err,result){
 })
 }
 const filtertype=(req,res)=>{
-    var qry="SELECT * FROM car_details cd WHERE cd.used_car='?'"
-    connection.query(qry,[req.body.value],function(err,result){
+    var data=req.body.value
+    var qry="SELECT * FROM car_details cd WHERE cd.status='0'"
+    console.log("result")
+        if (req.query.value && req.query.value > 0) {
+        qry += " and  cd.used_car IN ('?')";
+        data.push(req.query.value);
+    }
+    connection.query(qry,function(err,result){
         console.log(result)
         if(err){
             res.send({
@@ -74,6 +80,25 @@ const filtertype=(req,res)=>{
         }
     })
 }
+const getallcars=(req,res)=>{
+    var qry="SELECT * FROM car_details WHERE status=?"
+connection.query(qry,['0'],function(err,result){
+    console.log(result)
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+        })
+    }
+})
+}
 module.exports={
-    getcarstypes,getcarsbytypes,getcarbyid,filtertype
+    getcarstypes,getcarsbytypes,getcarbyid,filtertype,getallcars
 }
