@@ -1,5 +1,6 @@
 var connection = require('../../config/db');
-// var images = require ('./public/image/');
+//  var images = require ('../../public/image/img1.jpeg');
+
 
 const signup=(req,res)=>{
     var name=req.body.name
@@ -88,7 +89,7 @@ const Banner=(req,res)=>{
     
     let qry ="SELECT Concat(?, CASE WHEN banner_img != '' THEN  Concat(banner_img) end) as  banner_img from banner_images  WHERE STATUS=? ";
    
-    connection.query(qry,['../../public/image/','0'],function(err, result){
+    connection.query(qry,['/public/image/','0'],function(err, result){
         console.log("res",result)
     if(result)
     {
