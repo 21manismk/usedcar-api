@@ -26,3 +26,4 @@ var api_prefix='/api'
  app.use('/public', express.static('public'));
 
 app.use(api_prefix+'/users',require('./modules/users/user.route'));
+app.use(api_prefix+'/cars',require('./modules/cardetails/cardetails.route'));
