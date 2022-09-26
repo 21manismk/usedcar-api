@@ -109,11 +109,12 @@ const getallcars=(req,res)=>{
     let data=[]
     console.log("req.query.value",req.body.value)
     if (req.body.value) {
-        qry += " and cd.used_car IN ('?')";
+        qry += "AND cd.used_car IN (?)";
         data.push(req.body.value);
 }
 connection.query(qry,['/public/carsimage/','0',data],function(err,result){
     console.log(result)
+   // console.log(result.length)
     console.log(err)
     if(err){
         res.send({
