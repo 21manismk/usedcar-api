@@ -1,5 +1,26 @@
 var connection = require('../../config/db');
-
+async function carslisting(id) {
+    return new Promise(function (resolve, reject) {
+        // console.log("kk")
+        // console.log("kk",id)
+              var qry2="SELECT COUNT(cd.id) as count FROM car_details cd INNER JOIN car_type ct ON cd.car_type=ct.id WHERE cd.car_type=?"
+        connection.query(qry2,[id],function(err,result){
+            
+            if (err) {
+				logger.error(err);
+				//console.log(err);
+				resolve([]);
+			}
+			if (result) {
+				console.log(result);
+				resolve(result);
+			}
+        })
+      
+       
+   // }
+})
+}   
 const getcarstypes=(req,res)=>{
     var qry="SELECT car_type from car_type"
 connection.query(qry,function(err,result){
@@ -81,7 +102,7 @@ const filtertype=(req,res)=>{
     })
 }
 const getallcars=(req,res)=>{
-    var qry="SELECT cd.price,f.fuel_type,Concat(?, CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.status=?"
+    var qry="SELECT cd.car_name,cd.price,f.fuel_type,Concat(?, CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.status=?"
 connection.query(qry,['/public/carsimage/','0'],function(err,result){
     console.log(result)
     if(err){
@@ -99,6 +120,36 @@ connection.query(qry,['/public/carsimage/','0'],function(err,result){
     }
 })
 }
+const get_carsbytype=(req,res)=>{
+    let result={}
+    var qry="SELECT * FROM car_type"
+    connection.query(qry,async function(err,result){
+        if(err){
+            res.send({
+                status:400,
+                message:"err"
+            })
+        }
+        else if(result.length>0){
+             for(let i=0;i<result.length;i++){
+                result[i].count=await carslisting(result[i].id)
+                // console.log("resu",result[i].length)  
+                // console.log("resu",result[i].id) 
+   
+             }
+             status = 200;
+             success = true;
+             result.msg = 'success..!';
+
+             result.data = result;
+    // console.log("resu",result)
+
+    res.send(result);
+             }
+            
+        
+    })
+}
 module.exports={
-    getcarstypes,getcarsbytypes,getcarbyid,filtertype,getallcars
+    getcarstypes,getcarsbytypes,getcarbyid,filtertype,getallcars,get_carsbytype
 }
