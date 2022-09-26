@@ -184,8 +184,8 @@ const get_carsbytype=(req,res)=>{
     })
 }
 const carsdetailbyid=(req,res)=>{
-var qry="SELECT cd.id,ct.car_type,cd.color,cd.driven_type,t.transmission_type, CASE WHEN cd.used_car='0' THEN 'used' ELSE 'new' END AS carcondition,cd.year,cd.milleage,f.fuel_type,cd.engine_size,cd.door,cd.cylinder,cd.VIN FROM car_details cd INNER JOIN car_type ct ON ct.id=cd.car_type INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type WHERE cd.id=?"
-connection.query(qry,[req.body.id],async function(err,result){
+var qry="SELECT cd.id,CONCAT(?, CASE WHEN cd.car_image != '' THEN CONCAT(cd.car_image) END) AS car_image,ct.car_type,cd.color,cd.driven_type,t.transmission_type, CASE WHEN cd.used_car='0' THEN 'used' ELSE 'new' END AS carcondition,cd.year,cd.milleage,f.fuel_type,cd.engine_size,cd.door,cd.cylinder,cd.VIN FROM car_details cd INNER JOIN car_type ct ON ct.id=cd.car_type INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type WHERE cd.id=?"
+connection.query(qry,['/public/carsimage/',req.body.id],async function(err,result){
     if(err){
         res.send({
             status:400,
@@ -199,7 +199,7 @@ connection.query(qry,[req.body.id],async function(err,result){
             message:"success",
             data:result,
             image:image
-            
+
         })
     }
 })
