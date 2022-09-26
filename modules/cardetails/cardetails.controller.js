@@ -204,7 +204,28 @@ connection.query(qry,['/public/carsimage/',req.body.id],async function(err,resul
     }
 })
 }
+const getcars_similartype=(req,res)=>{
+      var qry="SELECT cd.id,cd.car_name,cd.price,f.fuel_type,Concat(?,CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type,cd.avg_review FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.car_type=?"
+     let data=[req.body.car_type]
+     connection.query(qry,['/public/carsimage/',data],function(err,result){
+     console.log(result)
+     console.log(err)
+     if(err){
+         res.send({
+             status:400,
+             message:"err"
+         })
+     }
+     else if(result){
+         res.send({
+             status:200,
+             message:"success",
+             data:result
+         })
+     }
+ })
+ }
 module.exports={
-    getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,carsdetailbyid,
+    getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,carsdetailbyid,getcars_similartype
     // filtertype,
 }
