@@ -112,7 +112,7 @@ const getallcars=(req,res)=>{
         qry += " and cd.used_car IN ('?')";
         data.push(req.body.value);
 }
-connection.query(qry,['/public/carsimage','0',data],function(err,result){
+connection.query(qry,['/public/carsimage/','0',data],function(err,result){
     console.log(result)
     console.log(err)
     if(err){
