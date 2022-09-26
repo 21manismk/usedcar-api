@@ -21,6 +21,28 @@ async function carslisting(id) {
    // }
 })
 }   
+async function carimages(id) {
+    return new Promise(function (resolve, reject) {
+        // console.log("kk")
+      
+              var qry2="SELECT CONCAT(?, CASE WHEN ci.car_image != '' THEN CONCAT(ci.car_image) END) AS car_image FROM car_image ci WHERE ci.car_id=?"
+        connection.query(qry2,['/public/carimg/',id],function(err,result){
+          
+            if (err) {
+				logger.error(err);
+				//console.log(err);
+				resolve([]);
+			}
+			if (result) {
+				
+				resolve(result);
+               			}
+        })
+      
+       
+   // }
+})
+}  
 const getcarstypes=(req,res)=>{
     var qry="SELECT car_type from car_type"
 connection.query(qry,function(err,result){
@@ -59,7 +81,7 @@ connection.query(qry,[req.body.car_type],function(err,result){
 })
 }
 const getcarbyid=(req,res)=>{
-    var qry="SELECT * FROM car_details WHERE id=?; "
+    var qry="SELECT * FROM car_details WHERE id=?"
 connection.query(qry,[req.body.cartype],function(err,result){
     if(err){
         res.send({
@@ -105,7 +127,7 @@ connection.query(qry,[req.body.cartype],function(err,result){
 
 const getallcars=(req,res)=>{
    // var data=['/public/carsimage/','0']
-    var qry="SELECT cd.car_name,cd.price,f.fuel_type,Concat(?,CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.status=?"
+    var qry="SELECT cd.id,cd.car_name,cd.price,f.fuel_type,Concat(?,CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.status=?"
     let data=[]
     console.log("req.query.value",req.body.value)
     if (req.body.value) {
@@ -161,7 +183,28 @@ const get_carsbytype=(req,res)=>{
         
     })
 }
+const carsdetailbyid=(req,res)=>{
+var qry="SELECT cd.id,ct.car_type,cd.color,cd.driven_type,t.transmission_type, CASE WHEN cd.used_car='0' THEN 'used' ELSE 'new' END AS carcondition,cd.year,cd.milleage,f.fuel_type,cd.engine_size,cd.door,cd.cylinder,cd.VIN FROM car_details cd INNER JOIN car_type ct ON ct.id=cd.car_type INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type WHERE cd.id=?"
+connection.query(qry,[req.body.id],async function(err,result){
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+       var image= await carimages(req.body.id)
+        res.send({
+            status:200,
+            message:"success",
+            data:result,
+            image:image
+            
+        })
+    }
+})
+}
 module.exports={
-    getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,
+    getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,carsdetailbyid,
     // filtertype,
 }
