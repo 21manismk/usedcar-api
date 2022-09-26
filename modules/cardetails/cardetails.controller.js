@@ -76,31 +76,32 @@ connection.query(qry,[req.body.cartype],function(err,result){
     }
 })
 }
-const filtertype=(req,res)=>{
-    var data=req.body.value
-    var qry="SELECT * FROM car_details cd WHERE cd.status=?"
-    console.log("result")
-        if (req.query.value && req.query.value > 0) {
-        qry += " and cd.used_car IN ('?')";
-        data.push(req.query.value);
-    }
-    connection.query(qry,['0'],function(err,result){
-        console.log(result)
-        if(err){
-            res.send({
-                status:400,
-                message:"err"
-            })
-        }
-        else if(result){
-            res.send({
-                status:200,
-                message:"success",
-                data:result
-            })
-        }
-    })
-}
+// const filtertype=(req,res)=>{
+    
+//      var query="SELECT * FROM car_details cd WHERE cd.status=?"
+//     console.log("result")
+//     var data=req.body.value
+//         if (req.query.value && req.query.value > 0) {
+//             query += " and cd.used_car IN ('?')";
+//         data.push(req.body.value);
+//     }
+//     connection.query(query,['0'],function(err,result){
+//         console.log(result)
+//         if(err){
+//             res.send({
+//                 status:400,
+//                 message:"err"
+//             })
+//         }
+//         else if(result){
+//             res.send({
+//                 status:200,
+//                 message:"success",
+//                 data:result
+//             })
+//         }
+//     })
+// }
 const getallcars=(req,res)=>{
     var qry="SELECT cd.car_name,cd.price,f.fuel_type,Concat(?, CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.status=?"
 connection.query(qry,['/public/carsimage/','0'],function(err,result){
@@ -122,8 +123,8 @@ connection.query(qry,['/public/carsimage/','0'],function(err,result){
 }
 const get_carsbytype=(req,res)=>{
     let result={}
-    var qry="SELECT * FROM car_type"
-    connection.query(qry,async function(err,result){
+    var qry="SELECT ct.id,ct.car_type,CONCAT(?,CASE WHEN ct.car_image != '' THEN  Concat(ct.car_image) end) as car_image  FROM car_type ct"
+    connection.query(qry,['/public/cartype/'],async function(err,result){
         if(err){
             res.send({
                 status:400,
