@@ -25,7 +25,7 @@ async function carimages(id) {
     return new Promise(function (resolve, reject) {
         console.log("kk")
       
-              var qry2="SELECT i.car_id,CONCAT(?,CASE WHEN i.car_image != '' THEN  Concat(i.car_image) end) as car_image FROM car_image i inner join car_details cd ON i.car_id=cd.car_id WHERE cd.car_id=?"
+              var qry2="SELECT i.car_id, CONCAT(?, CASE WHEN i.car_image != '' THEN CONCAT(i.car_image) END) AS car_image FROM car_image i left JOIN car_details cd ON i.car_id=cd.id WHERE i.car_id=?"
         connection.query(qry2,['/public/carsimage/',id],function(err,result){
             console.log(result)
             if (err) {
@@ -127,11 +127,11 @@ connection.query(qry,[req.body.cartype],function(err,result){
 
 const getallcars=(req,res)=>{
    // var data=['/public/carsimage/','0']
-    var qry="SELECT cd.car_id,cd.car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type "
+    var qry="SELECT cd.car_id,mdl.car_model AS car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.car_id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id "
     let data=[]
     console.log("req.query.value",req.body.value)
     if (req.body.value) {
-        qry += "AND cd.used_car IN (?)";
+        qry += "where cd.used_car IN (?)";
         data.push(req.body.value);
 }
 connection.query(qry,[data],async function(err,result){
@@ -297,6 +297,6 @@ const getcars_similartype=(req,res)=>{
 // })
 // }
 module.exports={
-    getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,carsdetailbyid,getcars_similartype
+    getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,carsdetailbyid,getcars_similartype,
     // filtertype,
 }
