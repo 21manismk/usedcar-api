@@ -88,7 +88,7 @@ const Banner=(req,res)=>{
     
     let qry ="SELECT CONCAT(?, CASE WHEN car_image != '' THEN  Concat(car_image) end) as  car_image from banner"
    
-    connection.query(qry,['/public/carsimage/'],function(err, result){
+    connection.query(qry,['/public/image/'],function(err, result){
         console.log("res",result)
     if(result)
     {
