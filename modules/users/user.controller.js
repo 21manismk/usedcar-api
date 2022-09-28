@@ -26,8 +26,8 @@ const signup=(req,res)=>{
             })
         }
         else{   
-     var qry1="INSERT INTO users  (user_name,password,email,phone) VALUE (?,?,?,?)"
-    connection.query(qry1,[name,password,email,phone],function(err, result1){
+     var qry1="INSERT INTO users  (user_name,password,email) VALUE (?,?,?)"
+    connection.query(qry1,[name,password,email],function(err, result1){
 if(err){
     res.send({
         status: '400',
