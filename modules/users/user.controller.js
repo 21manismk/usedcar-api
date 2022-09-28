@@ -26,8 +26,8 @@ const signup=(req,res)=>{
             })
         }
         else{   
-     var qry1="INSERT INTO users  (user_name,password,confirm_password,email,phone) VALUE (?,?,?,?,?)"
-    connection.query(qry1,[name,password,confirm_password,email,phone],function(err, result1){
+     var qry1="INSERT INTO users  (user_name,password,email,phone) VALUE (?,?,?,?)"
+    connection.query(qry1,[name,password,email,phone],function(err, result1){
 if(err){
     res.send({
         status: '400',
@@ -86,9 +86,9 @@ else{
 }
 const Banner=(req,res)=>{ 
     
-    let qry ="SELECT Concat(?, CASE WHEN banner_img != '' THEN  Concat(banner_img) end) as  banner_img from banner_images  WHERE STATUS=? ";
+    let qry ="SELECT CONCAT(?, CASE WHEN car_image != '' THEN  Concat(car_image) end) as  car_image from banner"
    
-    connection.query(qry,['/public/image/','0'],function(err, result){
+    connection.query(qry,['/public/carsimage/'],function(err, result){
         console.log("res",result)
     if(result)
     {
