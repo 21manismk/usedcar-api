@@ -184,7 +184,21 @@ const get_carsbytype=(req,res)=>{
         
     })
 }
+function splitStr(str, separator) {
+    var separator = ",";
+    // Function to split string
+    var string = str.split(separator);
+      
+    console.log(string);
+}
 const carsdetailbyid=(req,res)=>{
+    
+ var image={}
+ var conveninance={}
+ var entertainment={}
+ var exterior={}
+ var interior={}
+ var safety={}
 var qry="SELECT cd.id AS car_id,ck.car_make,ct.car_type,mdl.car_model,ft.fuel_type, tt.transmission_type,"
 +"(SELECT GROUP_CONCAT(CONCAT(?, CASE WHEN ci.car_image != '' THEN CONCAT(ci.car_image) END)) "
 +"FROM car_image ci "
@@ -224,11 +238,35 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
         })
     }
     else if(result){
+        var separator=',';
+         image=result[0].car_image
+         conveninance=result[0].cars_conveninance
+         entertainment=result[0].cars_entertainment
+         exterior=result[0].cars_exterior
+         interior=result[0].cars_interior
+         safety=result[0].cars_safety
+       // var car_image= splitStr(image)
+        var car_image= image.split(separator)
+        var cars_conveninance=conveninance.split(separator)
+        var cars_entertainment= entertainment.split(separator)
+        var cars_exterior= exterior.split(separator)
+        var cars_interior= interior.split(separator)
+        var cars_safety= safety.split(separator)
+          console.log("car_image",car_image)
 
              res.send({
             status:200,
             message:"success",
             data:result,
+             car_image:car_image,
+             cars_conveninance:cars_conveninance,
+             cars_entertainment:cars_entertainment,
+             cars_exterior:cars_exterior,
+             cars_interior:cars_interior,
+             cars_safety:cars_safety
+
+
+
            
 
         })
@@ -236,9 +274,9 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
 })
 }
 const getcars_similartype=(req,res)=>{
-      var qry="SELECT cd.id,cd.car_name,cd.price,f.fuel_type,Concat(?,CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type,cd.avg_review FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.car_type=?"
+      var qry="SELECT cd.id,cm.car_model,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.avg_review FROM car_details cd INNER JOIN car_image ci ON ci.id=cd.id INNER JOIN car_model_details cmd ON cmd.id=cd.id INNER JOIN car_model cm ON cm.id=cmd.car_model INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type INNER JOIN car_type ct ON ct.id=cmd.car_type WHERE ct.car_type=?"
      let data=[req.body.car_type]
-     connection.query(qry,['/public/carsimage/',data],function(err,result){
+     connection.query(qry,[data],function(err,result){
      console.log(result)
      console.log(err)
      if(err){
@@ -256,39 +294,57 @@ const getcars_similartype=(req,res)=>{
      }
  })
  }
-//  const listingfilter=(req,res)=>{
-//    // var data=['/public/carsimage/','0']
-//     var qry="SELECT cd.id,cd.car_name,cd.price,f.fuel_type,Concat(?,CASE WHEN cd.car_image != '' THEN  Concat(cd.car_image) end) as car_image,t.transmission_type AS gear_type FROM car_details cd INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type where cd.status=?"
-//     let data=[]
-//     console.log("req.query.value",req.body.value)
-//     if (req.body.value) {
-//         qry += "AND cd.used_car IN (?)";
-//         data.push(req.body.value);
-// }
-// if (req.body.value) {
-//     qry += "AND cd.used_car IN (?)";
-//     data.push(req.body.value);
-// }
-// connection.query(qry,['/public/carsimage/','0',data],function(err,result){
-//     console.log(result)
-//    // console.log(result.length)
-//     console.log(err)
-//     if(err){
-//         res.send({
-//             status:400,
-//             message:"err"
-//         })
-//     }
-//     else if(result){
-//         res.send({
-//             status:200,
-//             message:"success",
-//             data:result
-//         })
-//     }
-// })
-// }
+ const filtertype=(req,res)=>{
+    // var data=['/public/carsimage/','0']
+     var qry="SELECT cd.id,mdl.car_model AS car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.total_review FROM car_details cd LEFT JOIN transmission_type t ON t.id=cd.transmission_type LEFT JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id "
+     let data=[]
+     console.log("req.query.value",req.body.car_make)
+     console.log("req.query.value",req.body.transmission_type)
+     if (req.body.car_make) {
+        console.log("k")
+         qry += "where cm.car_make IN (?) ";
+         data.push(req.body.car_make);
+ }
+ if (req.body.car_type) {
+    qry += "AND cm.car_type IN (?) ";
+    data.push(req.body.car_type);
+}
+ if (req.body.car_model) {
+    qry += "AND cm.car_model IN (?) ";
+    data.push(req.body.car_model);
+}
+if (req.body.fuel_type) {
+    qry += "AND cd.fuel_type IN (?) ";
+    data.push(req.body.fuel_type);
+}
+if (req.body.transmission_type) {
+    qry += "AND cd.transmission_type IN (?) ";
+    data.push(req.body.transmission_type);
+}
+
+ connection.query(qry,[data],async function(err,result){
+    console.log(err)
+        if(err){
+         res.send({
+             status:400,
+             message:"err"
+         })
+     }
+     else if(result){
+             for(let i=0;i<result.length;i++){
+             result[i].img= await carimages(result[i].id)
+                }
+         status = 200;
+         success = true;
+         result.msg = 'success..!';
+ 
+         result.data = result;
+         res.send(result);
+     }
+   
+ })
+ }
 module.exports={
     getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,carsdetailbyid,getcars_similartype,
-    // filtertype,
+     filtertype,
 }

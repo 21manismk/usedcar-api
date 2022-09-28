@@ -10,4 +10,5 @@ router.post('/getallcars',carcontroller.getallcars);
 router.post('/get_carsbytype',carcontroller.get_carsbytype);
 router.post('/carsdetailbyid',carcontroller.carsdetailbyid);
 router.post('/getcars_similartype',carcontroller.getcars_similartype);
+router.post('/listingfiltertype',carcontroller.filtertype);
 module.exports = router;
