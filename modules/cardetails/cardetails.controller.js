@@ -485,7 +485,7 @@ connection.query(qry,function(err,result){
 })
 }
 const Savecontactdetails=(req,res)=>{
-    var qry="INSERT INTO `usedcarss`.`contact_form` (`first_name`, `last_name`, `email`, `phone`, `message`) VALUES ?"
+    var qry="INSERT INTO `contact_form` (`first_name`, `last_name`, `email`, `phone`, `message`) VALUES (?,?,?,?,?)"
 connection.query(qry,[req.body.first_name,req.body.last_name,req.body.email,req.body.phone,req.body.message],function(err,result){
     console.log(err)
     if(err){
@@ -497,7 +497,7 @@ connection.query(qry,[req.body.first_name,req.body.last_name,req.body.email,req.
     else if(result){
         res.send({
             status:200,
-            message:"success",
+            message:"conatct saved successfully",
             data:result
         })
     }
