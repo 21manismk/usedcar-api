@@ -17,4 +17,7 @@ router.post('/cartype',carcontroller.cartype);
 router.post('/car_modal',carcontroller.car_modal);
 router.post('/transmissionType',carcontroller.transmissionType);
 router.post('/fuelType',carcontroller.fuelType);
+router.post('/Getallbookingdetails',carcontroller.Getallbookingdetails);
+router.post('/Savecontactdetails',carcontroller.Savecontactdetails);
+
 module.exports = router;
