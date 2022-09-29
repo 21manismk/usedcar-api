@@ -274,9 +274,8 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
 })
 }
 const getcars_similartype=(req,res)=>{
-      var qry="SELECT cd.id,cm.car_model,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.avg_review FROM car_details cd INNER JOIN car_image ci ON ci.id=cd.id INNER JOIN car_model_details cmd ON cmd.id=cd.id INNER JOIN car_model cm ON cm.id=cmd.car_model INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type INNER JOIN car_type ct ON ct.id=cmd.car_type WHERE ct.car_type=?"
-     let data=[req.body.car_type]
-     connection.query(qry,[data],function(err,result){
+      var qry="SELECT cd.id,cm.car_model,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.avg_review FROM car_details cd INNER JOIN car_image ci ON ci.id=cd.id INNER JOIN car_model_details cmd ON cmd.id=cd.id INNER JOIN car_model cm ON cm.id=cmd.car_model INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type INNER JOIN car_type ct ON ct.id=cmd.car_type where ct.car_type=?"
+      connection.query(qry,[req.body.car_type],async function(err,result){
      console.log(result)
      console.log(err)
      if(err){
@@ -286,42 +285,50 @@ const getcars_similartype=(req,res)=>{
          })
      }
      else if(result){
-         res.send({
-             status:200,
-             message:"success",
-             data:result
-         })
-     }
+        for(let i=0;i<result.length;i++){
+        result[i].img= await carimages(result[i].id)
+           }
+    status = 200;
+    success = true;
+    result.msg = 'success..!';
+
+    result.data = result;
+    res.send(result);
+}
  })
  }
  const filtertype=(req,res)=>{
     // var data=['/public/carsimage/','0']
-     var qry="SELECT cd.id,mdl.car_model AS car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.total_review FROM car_details cd LEFT JOIN transmission_type t ON t.id=cd.transmission_type LEFT JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id "
-     let data=[]
-     console.log("req.query.value",req.body.car_make)
-     console.log("req.query.value",req.body.transmission_type)
-     if (req.body.car_make) {
+     var qry="SELECT cd.id,mdl.car_model AS car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.total_review FROM car_details cd LEFT JOIN transmission_type t ON t.id=cd.transmission_type LEFT JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id where "
+   let data
+     console.log("car_make",req.body.car_make)
+     console.log("car_type",req.body.car_type)
+     if (req.body.car_make!=null&&req.body.car_make!=""&&req.body.car_make!=undefined) {
         console.log("k")
-         qry += "where cm.car_make IN (?) ";
+         qry += "cm.car_make =? ";
          data.push(req.body.car_make);
+         console.log(qry)
+         console.log(data)
  }
- if (req.body.car_type) {
-    qry += "AND cm.car_type IN (?) ";
+ if (req.body.car_type!=null&&req.body.car_type!=""&&req.body.car_type!=undefined ) {
+    qry += "AND cm.car_type=? ";
     data.push(req.body.car_type);
+    console.log(qry)
+    console.log(data)
 }
- if (req.body.car_model) {
-    qry += "AND cm.car_model IN (?) ";
-    data.push(req.body.car_model);
-}
-if (req.body.fuel_type) {
-    qry += "AND cd.fuel_type IN (?) ";
-    data.push(req.body.fuel_type);
-}
-if (req.body.transmission_type) {
-    qry += "AND cd.transmission_type IN (?) ";
-    data.push(req.body.transmission_type);
-}
-
+//  if (req.body.car_model!=null&&req.body.car_model!=""&&req.body.car_model!=undefined) {
+//     qry += "AND cm.car_model=? ";
+//     data.push(req.body.car_model);
+// }
+// if (req.body.fuel_type!=null&&req.body.fuel_type!=""&&req.body.fuel_type!=undefined) {
+//     qry += "AND cd.fuel_type=? ";
+//     data.push(req.body.fuel_type);
+// }
+// if (req.body.transmission_type!=null&&req.body.transmission_type!=""&&req.body.transmission_type!=undefined) {
+//     qry += "AND cd.transmission_type=? ";
+//     data.push(req.body.transmission_type);
+// }
+console.log(qry)
  connection.query(qry,[data],async function(err,result){
     console.log(err)
         if(err){
@@ -331,6 +338,7 @@ if (req.body.transmission_type) {
          })
      }
      else if(result){
+        console.log(result)
              for(let i=0;i<result.length;i++){
              result[i].img= await carimages(result[i].id)
                 }
@@ -344,7 +352,100 @@ if (req.body.transmission_type) {
    
  })
  }
+ const carmake=(req,res)=>{
+    var qry="SELECT * FROM car_make;"
+connection.query(qry,function(err,result){
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+        })
+    }
+})
+}
+const cartype=(req,res)=>{
+    var qry="SELECT * FROM car_type"
+connection.query(qry,function(err,result){
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+        })
+    }
+})
+}
+const car_modal=(req,res)=>{
+    var qry="SELECT * FROM car_model"
+connection.query(qry,function(err,result){
+    console.log(err)
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+        })
+    }
+})
+}
+const transmissionType=(req,res)=>{
+    var qry="SELECT * FROM transmission_type"
+connection.query(qry,function(err,result){
+    console.log(err)
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+        })
+    }
+})
+}
+const fuelType=(req,res)=>{
+    var qry="SELECT * FROM fuel_type"
+connection.query(qry,function(err,result){
+    console.log(err)
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+        })
+    }
+})
+}
 module.exports={
     getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,carsdetailbyid,getcars_similartype,
-     filtertype,
+     filtertype,carmake,cartype,car_modal,transmissionType,fuelType
 }
