@@ -299,35 +299,48 @@ const getcars_similartype=(req,res)=>{
  }
  const filtertype=(req,res)=>{
     // var data=['/public/carsimage/','0']
-     var qry="SELECT cd.id,mdl.car_model AS car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.total_review FROM car_details cd LEFT JOIN transmission_type t ON t.id=cd.transmission_type LEFT JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id where "
-   let data
+     var qry="SELECT cd.id,mdl.car_model AS car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.total_review FROM car_details cd LEFT JOIN transmission_type t ON t.id=cd.transmission_type LEFT JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id where cd.is_featured='1' "
+   let data=[]
      console.log("car_make",req.body.car_make)
      console.log("car_type",req.body.car_type)
      if (req.body.car_make!=null&&req.body.car_make!=""&&req.body.car_make!=undefined) {
         console.log("k")
-         qry += "cm.car_make =? ";
+         qry += " And cm.car_make ="+req.body.car_make;
          data.push(req.body.car_make);
-         console.log(qry)
-         console.log(data)
- }
+        }
  if (req.body.car_type!=null&&req.body.car_type!=""&&req.body.car_type!=undefined ) {
-    qry += "AND cm.car_type=? ";
+    qry += " AND cm.car_type="+req.body.car_type;
     data.push(req.body.car_type);
-    console.log(qry)
-    console.log(data)
+   }
+console.log(data);
+ if (req.body.car_model!=null&&req.body.car_model!=""&&req.body.car_model!=undefined) {
+    qry += " AND cm.car_model=?"+req.body.car_model;
+    data.push(req.body.car_model);
 }
-//  if (req.body.car_model!=null&&req.body.car_model!=""&&req.body.car_model!=undefined) {
-//     qry += "AND cm.car_model=? ";
-//     data.push(req.body.car_model);
-// }
-// if (req.body.fuel_type!=null&&req.body.fuel_type!=""&&req.body.fuel_type!=undefined) {
-//     qry += "AND cd.fuel_type=? ";
-//     data.push(req.body.fuel_type);
-// }
-// if (req.body.transmission_type!=null&&req.body.transmission_type!=""&&req.body.transmission_type!=undefined) {
-//     qry += "AND cd.transmission_type=? ";
-//     data.push(req.body.transmission_type);
-// }
+if (req.body.fuel_type!=null&&req.body.fuel_type!=""&&req.body.fuel_type!=undefined) {
+    qry += " AND cd.fuel_type=?"+req.body.fuel_type;
+    data.push(req.body.fuel_type);
+}
+if (req.body.transmission_type!=null&&req.body.transmission_type!=""&&req.body.transmission_type!=undefined) {
+    qry += " AND cd.transmission_type=?"+req.body.transmission_type;
+    data.push(req.body.transmission_type);
+}
+if (req.body.startYearOfSale!=null&&req.body.startYearOfSale!=""&&req.body.startYearOfSale!=undefined) {
+    qry += " AND cd.year_ofsale>"+req.body.startYearOfSale;
+    data.push(req.body.startYearOfSale);
+}
+if (req.body.endYearOfSale!=null&&req.body.endYearOfSale!=""&&req.body.endYearOfSale!=undefined) {
+    qry += " AND cd.year_ofsale<"+req.body.endYearOfSale;
+    data.push(req.body.endYearOfSale);
+}
+if (req.body.startKilometerDriven!=null&&req.body.startKilometerDriven!=""&&req.body.startKilometerDriven!=undefined) {
+    qry += " AND cd.kilometer_driven>"+req.body.startKilometerDriven;
+    data.push(req.body.startKilometerDriven);
+}
+if (req.body.endKilometerDriven!=null&&req.body.endKilometerDriven!=""&&req.body.endKilometerDriven!=undefined) {
+    qry += " AND cd.kilometer_driven<"+req.body.endKilometerDriven;
+    data.push(req.body.endKilometerDriven);
+}
 console.log(qry)
  connection.query(qry,[data],async function(err,result){
     console.log(err)
@@ -348,6 +361,13 @@ console.log(qry)
  
          result.data = result;
          res.send(result);
+     }
+     else{
+        res.send({
+            status:400,
+            message:"No data found",
+            data:[]
+        })
      }
    
  })
@@ -445,7 +465,45 @@ connection.query(qry,function(err,result){
     }
 })
 }
+const Getallbookingdetails=(req,res)=>{
+    var qry="SELECT * FROM car_booking"
+connection.query(qry,function(err,result){
+    console.log(err)
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+        })
+    }
+})
+}
+const Savecontactdetails=(req,res)=>{
+    var qry="INSERT INTO `usedcarss`.`contact_form` (`first_name`, `last_name`, `email`, `phone`, `message`) VALUES ?"
+connection.query(qry,[req.body.first_name,req.body.last_name,req.body.email,req.body.phone,req.body.message],function(err,result){
+    console.log(err)
+    if(err){
+        res.send({
+            status:400,
+            message:"err"
+        })
+    }
+    else if(result){
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+        })
+    }
+})
+}
 module.exports={
     getcarstypes,getcarsbytypes,getcarbyid,getallcars,get_carsbytype,carsdetailbyid,getcars_similartype,
-     filtertype,carmake,cartype,car_modal,transmissionType,fuelType
+     filtertype,carmake,cartype,car_modal,transmissionType,fuelType,Getallbookingdetails,Savecontactdetails
 }
