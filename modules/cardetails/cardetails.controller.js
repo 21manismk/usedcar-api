@@ -353,7 +353,8 @@ const getcars_similartype=(req,res)=>{
    let data=[]
      console.log("car_make",req.body.car_make)
      console.log("car_type",req.body.car_type)
-     if (req.body.car_make!=null&&req.body.car_make!=""&&req.body.car_make!=undefined) {
+    
+       if (req.body.car_make!=null&&req.body.car_make!=""&&req.body.car_make!=undefined) {
         console.log("k")
          qry += " And cm.car_make ="+req.body.car_make;
          data.push(req.body.car_make);
@@ -390,6 +391,10 @@ if (req.body.startKilometerDriven!=null&&req.body.startKilometerDriven!=""&&req.
 if (req.body.endKilometerDriven!=null&&req.body.endKilometerDriven!=""&&req.body.endKilometerDriven!=undefined) {
     qry += " AND cd.kilometer_driven<"+req.body.endKilometerDriven;
     data.push(req.body.endKilometerDriven);
+}
+if (req.body.value!=null&&req.body.value!=""&&req.body.value!=undefined) {
+    qry += " and cd.used_car IN ("+"?"+")";
+    data.push(req.body.value);
 }
 console.log(qry)
  connection.query(qry,[data],async function(err,result){
