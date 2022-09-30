@@ -20,25 +20,77 @@ async function carslisting(id) {
        
    // }
 })
-}   
-async function carimages(id) {
-    return new Promise(function (resolve, reject) {
-           
-              var qry2="SELECT i.car_id, CONCAT(?, CASE WHEN i.car_image != '' THEN CONCAT(i.car_image) END) AS car_image FROM car_image i left JOIN car_details cd ON i.car_id=cd.id WHERE i.car_id=?"
-        connection.query(qry2,['/public/carsimage/',id],function(err,result){
+}  
+async function QueryListData(query,data,res) {
+    return new Promise( function(resolve , reject ){
+      
+        connection.query(query,data,(err, result,cache) => {
             
+            if(err) 
+            {
+                //console.log(err);
+                logger.error(err);
+               
+            }
+            
+            //console.log(typeof result);
+    
+            if(result){
+                if(cache.isCache==false)
+            {
+                sql.flush();
+            }
+            resolve(result);
+            } 
+                
+            else resolve([]);
+        });
+      });
+    };
+async function get_first_img(result,req,res){
+    return new Promise(async function(resolve, reject){
+            for(var i=0; i<result.length;i++)
+            {
+                let query ="SELECT i.car_id, CONCAT(?, CASE WHEN i.car_image != '' THEN CONCAT(i.car_image) END) AS car_image FROM car_image i left JOIN car_details cd ON i.car_id=cd.id WHERE i.car_id=?";
+                
+                if(result[i]['car_image'] && typeof result[i]['car_image'] !=="undefined" && result[i]['car_image']>0){
+                    var data =['/public/carsimage/',result[i]['car_image']];	
+                }else{
+                     var data =['/public/carsimage/',result[i].id];
+                }
+               
+                 let reslt= await QueryListData(query,data,res);
+               
+
+                 if(reslt && reslt.length>0)
+                 {
+                     result[i]['car_image'] =reslt[0]['car_image'];
+                 }
+                 else
+                 {
+                     result[i]['car_image'] ='';
+                 }
+            }
+       console.log("fffffff======>>>>",result)
+            resolve(result);
+        });
+    };
+async function carimages(result) {
+    return new Promise(function (resolve, reject) {
+                     
+              var qry2="SELECT i.car_id, CONCAT(?, CASE WHEN i.car_image != '' THEN CONCAT(i.car_image) END) AS car_image FROM car_image i left JOIN car_details cd ON i.car_id=cd.id WHERE i.car_id=?"
+        connection.query(qry2,['/public/carsimage/',result[i].id],function(err,result){
+            console.log(qry2)
             if (err) {
 				logger.error(err);
 				//console.log(err);
 				resolve([]);
 			}
 			if (result) {
+                resolve(result);
 				
-				resolve(result);
-               			}
-        })
-      
-       
+            }
+        })  
    // }
 })
 }  
@@ -126,7 +178,7 @@ connection.query(qry,[req.body.cartype],function(err,result){
 
 const getallcars=(req,res)=>{
    // var data=['/public/carsimage/','0']
-    var qry="SELECT cd.id,mdl.car_model AS car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type FROM car_details cd left JOIN transmission_type t ON t.id=cd.transmission_type left JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id "
+    var qry="SELECT cd.id,mdl.car_model AS car_name,ct.car_type,cd.price,f.fuel_type,t.transmission_type AS gear_type FROM car_details cd left JOIN transmission_type t ON t.id=cd.transmission_type left JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id LEFT JOIN car_type ct ON ct.id=cm.car_type "
     let data=[]
     console.log("req.query.value",req.body.value)
     if (req.body.value) {
@@ -141,15 +193,14 @@ connection.query(qry,[data],async function(err,result){
         })
     }
     else if(result){
-            for(let i=0;i<result.length;i++){
-            result[i].img= await carimages(result[i].id)
-               }
-        status = 200;
-        success = true;
-        result.msg = 'success..!';
-
-        result.data = result;
-        res.send(result);
+       await get_first_img(result,req,res)
+       console.log("img",result)
+        res.send({
+            status:200,
+            message:"success",
+            data:result
+            
+        })
     }
   
 })
@@ -276,7 +327,7 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
 const getcars_similartype=(req,res)=>{
       var qry="SELECT cd.id,cm.car_model,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.avg_review FROM car_details cd INNER JOIN car_image ci ON ci.id=cd.id INNER JOIN car_model_details cmd ON cmd.id=cd.id INNER JOIN car_model cm ON cm.id=cmd.car_model INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type INNER JOIN car_type ct ON ct.id=cmd.car_type where ct.car_type=?"
       connection.query(qry,[req.body.car_type],async function(err,result){
-     console.log(result)
+     console.log("ss",result)
      console.log(err)
      if(err){
          res.send({
@@ -285,15 +336,14 @@ const getcars_similartype=(req,res)=>{
          })
      }
      else if(result){
-        for(let i=0;i<result.length;i++){
-        result[i].img= await carimages(result[i].id)
-           }
-    status = 200;
-    success = true;
-    result.msg = 'success..!';
-
-    result.data = result;
-    res.send(result);
+        await get_first_img(result,req,res)
+        console.log("img",result)
+         res.send({
+             status:200,
+             message:"success",
+             data:result
+             
+         })
 }
  })
  }
@@ -351,16 +401,14 @@ console.log(qry)
          })
      }
      else if(result){
-        console.log(result)
-             for(let i=0;i<result.length;i++){
-             result[i].img= await carimages(result[i].id)
-                }
-         status = 200;
-         success = true;
-         result.msg = 'success..!';
- 
-         result.data = result;
-         res.send(result);
+        await get_first_img(result,req,res)
+        console.log("img",result)
+         res.send({
+             status:200,
+             message:"success",
+             data:result
+             
+         })
      }
      else{
         res.send({
