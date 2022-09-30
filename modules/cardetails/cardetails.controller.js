@@ -364,15 +364,15 @@ const getcars_similartype=(req,res)=>{
    }
 console.log(data);
  if (req.body.car_model!=null&&req.body.car_model!=""&&req.body.car_model!=undefined) {
-    qry += " AND cm.car_model=?"+req.body.car_model;
+    qry += " AND cm.car_model="+req.body.car_model;
     data.push(req.body.car_model);
 }
 if (req.body.fuel_type!=null&&req.body.fuel_type!=""&&req.body.fuel_type!=undefined) {
-    qry += " AND cd.fuel_type=?"+req.body.fuel_type;
+    qry += " AND cd.fuel_type="+req.body.fuel_type;
     data.push(req.body.fuel_type);
 }
 if (req.body.transmission_type!=null&&req.body.transmission_type!=""&&req.body.transmission_type!=undefined) {
-    qry += " AND cd.transmission_type=?"+req.body.transmission_type;
+    qry += " AND cd.transmission_type="+req.body.transmission_type;
     data.push(req.body.transmission_type);
 }
 if (req.body.startYearOfSale!=null&&req.body.startYearOfSale!=""&&req.body.startYearOfSale!=undefined) {
@@ -410,7 +410,7 @@ console.log(qry)
              
          })
      }
-     else{
+     else if(result.length<0){
         res.send({
             status:400,
             message:"No data found",
