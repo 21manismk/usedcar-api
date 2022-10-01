@@ -349,7 +349,7 @@ const getcars_similartype=(req,res)=>{
  }
  const filtertype=(req,res)=>{
     // var data=['/public/carsimage/','0']
-     var qry="SELECT cd.id,mdl.car_model AS car_name,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.total_review FROM car_details cd LEFT JOIN transmission_type t ON t.id=cd.transmission_type LEFT JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id where cd.is_featured='1' "
+     var qry="SELECT cd.id,mdl.car_model AS car_name,cd.price,ct.car_type,f.fuel_type,t.transmission_type AS gear_type,cd.total_review FROM car_details cd LEFT JOIN transmission_type t ON t.id=cd.transmission_type LEFT JOIN fuel_type f ON f.id=cd.fuel_type LEFT JOIN car_model_details cm ON cd.id=cm.id LEFT JOIN car_model mdl ON cm.car_model=mdl.id LEFT JOIN car_type ct ON ct.id=cm.car_type  where cd.is_featured='1' "
    let data=[]
      console.log("car_make",req.body.car_make)
      console.log("car_type",req.body.car_type)
