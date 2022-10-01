@@ -292,7 +292,7 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
             message:"err"
         })
     }
-    else if(result){
+    if(result.length>0){
         console.log(result)
         console.log(result[0].car_id)
         firstimg=await carimages(result[0].car_id)
@@ -323,11 +323,15 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
              cars_interior:cars_interior,
              cars_safety:cars_safety,
              firstimg:firstimg
+            
 
-
-
-           
-
+        })
+    }
+    else if(result.length==0)
+    {
+        res.send({
+            status:400,
+            message:"no data found"
         })
     }
 })
