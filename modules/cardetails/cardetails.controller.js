@@ -75,21 +75,25 @@ async function get_first_img(result,req,res){
             resolve(result);
         });
     };
-async function carimages(result) {
+async function carimages(id) {
     return new Promise(function (resolve, reject) {
-                     
+        console.log("resu",id)
               var qry2="SELECT i.car_id, CONCAT(?, CASE WHEN i.car_image != '' THEN CONCAT(i.car_image) END) AS car_image FROM car_image i left JOIN car_details cd ON i.car_id=cd.id WHERE i.car_id=?"
-        connection.query(qry2,['/public/carsimage/',result[i].id],function(err,result){
+        connection.query(qry2,['/public/carsimage/',id],function(err,resu){
             console.log(qry2)
             if (err) {
 				logger.error(err);
 				//console.log(err);
 				resolve([]);
 			}
-			if (result) {
-                resolve(result);
+			if (resu) {
+                console.log("resu",resu)
+            first_img=resu[0].car_image
+                
 				
             }
+            console.log("first_img",first_img)
+            resolve(first_img);
         })  
    // }
 })
@@ -289,6 +293,9 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
         })
     }
     else if(result){
+        console.log(result)
+        console.log(result[0].car_id)
+        firstimg=await carimages(result[0].car_id)
         var separator=',';
          image=result[0].car_image
          conveninance=result[0].cars_conveninance
@@ -314,7 +321,8 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
              cars_entertainment:cars_entertainment,
              cars_exterior:cars_exterior,
              cars_interior:cars_interior,
-             cars_safety:cars_safety
+             cars_safety:cars_safety,
+             firstimg:firstimg
 
 
 
