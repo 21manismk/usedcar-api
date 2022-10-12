@@ -186,10 +186,26 @@ const getallcars=(req,res)=>{
     let data=[]
     console.log("req.query.value",req.body.value)
     if (req.body.value) {
+        console.log("vv")
         qry += "where cd.used_car IN (?)";
         data.push(req.body.value);
 }
+if(req.body.last_id && req.body.last_id>0)
+{
+    console.log("lastid")
+    qry+=" and cd.id<"+req.body.last_id;
+    data.push(req.body.last_id);
+}
+if(req.body.page_records && req.body.page_records>0)
+{
+console.log("limit")
+qry+= " ORDER BY cd.id DESC LIMIT "+req.body.page_records;
+
+data.push(req.body.page_records);
+}
+console.log("qry",qry)
 connection.query(qry,[data],async function(err,result){
+    console.log("qry",qry)
        if(err){
         res.send({
             status:400,
@@ -331,15 +347,39 @@ connection.query(qry,['/public/carsimage/',req.body.id,req.body.id,req.body.id,r
     {
         res.send({
             status:400,
-            message:"no data found"
+            message:"no data found",
+            data:[]
         })
     }
 })
 }
 const getcars_similartype=(req,res)=>{
-      var qry="SELECT cd.id,cm.car_model,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.avg_review FROM car_details cd INNER JOIN car_image ci ON ci.id=cd.id INNER JOIN car_model_details cmd ON cmd.id=cd.id INNER JOIN car_model cm ON cm.id=cmd.car_model INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type INNER JOIN car_type ct ON ct.id=cmd.car_type where ct.car_type=?"
-      connection.query(qry,[req.body.car_type],async function(err,result){
+   // var page_records=5
+   var data=[]
+      var qry="SELECT cd.id,cm.car_model,cd.price,f.fuel_type,t.transmission_type AS gear_type,cd.avg_review FROM car_details cd INNER JOIN car_image ci ON ci.id=cd.id INNER JOIN car_model_details cmd ON cmd.id=cd.id INNER JOIN car_model cm ON cm.id=cmd.car_model INNER JOIN transmission_type t ON t.id=cd.transmission_type INNER JOIN fuel_type f ON f.id=cd.fuel_type INNER JOIN car_type ct ON ct.id=cmd.car_type "
+     
+       if(req.body.car_type && req.body.car_type)
+      {
+        console.log("type")
+           qry+=' where ct.car_type='+"'"+req.body.car_type+"'";
+           data.push(req.query.car_type);
+      }
+      if(req.body.last_id && req.body.last_id>0)
+	            {
+                    console.log("lastid")
+	                qry+=" and cd.id<"+req.body.last_id;
+	                data.push(req.body.last_id);
+	            }
+      if(req.body.page_records && req.body.page_records>0)
+      {
+        console.log("limit")
+        qry+= " ORDER BY cd.id DESC LIMIT "+req.body.page_records;
+          
+           data.push(req.body.page_records);
+      }
+      connection.query(qry,[data],async function(err,result){
      console.log("ss",result)
+     console.log("ss",qry)
      console.log(err)
      if(err){
          res.send({
